@@ -1,4 +1,5 @@
-# AdaptAlloc — Adaptive Object Detection with Reinforcement Learning
+# AdaptAlloc — Adaptive Object Detection with Contextual Bandit
+
 
 AdaptAlloc is a Streamlit dashboard that uses a REINFORCE policy to dynamically route each video frame to either **YOLOv8** (fast, lower energy) or **RT-DETR** (accurate, higher energy) based on scene complexity. The goal is to minimise compute cost while preserving detection quality — only invoking the heavier model when the scene actually warrants it.
 

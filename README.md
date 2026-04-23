@@ -6,19 +6,6 @@
 
 ---
 
-## What was fixed vs the original
-
-| # | Problem | Fix |
-|---|---------|-----|
-| 1 | **Wrong weights** — defaults pointed to `yolov8n.pt` (generic), not crack-finetuned models | Defaults now point to `data/models/yolo_cracks.pt` / `data/models/rtdetr_folder` |
-| 2 | **Broken reward** — used raw `avg_confidence` as proxy F1 (same for both actions → no learning signal) | Reward uses **improvement over YOLO** as proxy; real IoU-F1 when labels are available |
-| 3 | **No Shannon entropy** — README claimed scene complexity via Shannon entropy, but it was never computed | `compute_pixel_entropy()` in `policy.py` added as state dim 8 |
-| 4 | **Policy never converges** — ε fixed at 0.20 forever, batch=8 only | ε decays per frame (0.20 → 0.03), running reward normalisation added |
-| 5 | **Unfair baseline** — Streamlit Stream B ran both models always, making cost comparison misleading | Stream B now shows YOLO-only \| RT-DETR side-by-side; `baseline_compare.py` is the canonical 3-way comparison |
-| 6 | **No pre-training** — policy was random at demo time | New `pretrain_policy.py` script |
-
----
-
 ## Architecture
 
 ```

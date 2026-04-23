@@ -1,0 +1,9 @@
+﻿data/
+checkpoints/
+crack_detection-1/
+__pycache__/
+*.pt
+*.pth
+*.safetensors
+*.bin
+*.onnx

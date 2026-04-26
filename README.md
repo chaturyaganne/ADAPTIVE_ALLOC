@@ -102,10 +102,23 @@ streamlit run main.py
 
 ### Option 2 — Docker
 
-```bash
+# Option A — Pull prebuilt image from DockerHub (fastest)
+docker pull chatu05/adaptive_alloc:latest
+docker compose up
+
+# Option B — Build locally from source
 docker compose up --build
-# Open http://localhost:8501
-```
+
+# Run in background
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down
+
+# → Open http://localhost:8501
 
 The Docker image is based on `pytorch/pytorch:2.2.0-cuda12.1-cudnn8-runtime`. The `checkpoints/`, `outputs/`, and `data/` directories are bind-mounted so your models and saved checkpoints persist across container restarts.
 

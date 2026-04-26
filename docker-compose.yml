@@ -1,9 +1,8 @@
-version: "3.9"
 services:
   adaptalloc:
-    #build: .
-    image: chatu05/adaptive_alloc:latest
-   # container_name: adaptalloc_demo
+    build: .
+    image: adaptalloc:latest
+    container_name: adaptalloc_demo
     ports:
       - "8501:8501"
     volumes:
@@ -16,13 +15,6 @@ services:
       - ENERGY_ALPHA=${ENERGY_ALPHA:-0.40}
       - CONF_THRESH=${CONF_THRESH:-0.25}
       - ROBOFLOW_API_KEY=${ROBOFLOW_API_KEY:-}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
     restart: unless-stopped
 
   baseline:
@@ -41,12 +33,5 @@ services:
       - ./data:/app/data
     environment:
       - ROBOFLOW_API_KEY=${ROBOFLOW_API_KEY:-}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
     profiles:
       - baseline

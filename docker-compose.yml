@@ -1,9 +1,9 @@
 version: "3.9"
 services:
   adaptalloc:
-    build: .
-    image: adaptalloc:latest
-    container_name: adaptalloc_demo
+    #build: .
+    image: chatu05/adaptive_alloc:latest
+   # container_name: adaptalloc_demo
     ports:
       - "8501:8501"
     volumes:

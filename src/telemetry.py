@@ -37,24 +37,37 @@ class FrameMetrics:
     energy_mj:       float = 0.0
     n_detections:    int   = 0
     avg_confidence:  float = 0.0
+    device:          str   = "cpu"  # Track which device was used
 
     def __post_init__(self):
-        # Simple energy estimate: 150 W TDP assumption for GPU
-        # E (mJ) = P (W) * t (s) * 1000  → 150 * (gpu_ms/1000) * 1000
+        # Energy estimate based on device type
+        # E (mJ) = P (W) * t (s) * 1000
         if self.energy_mj == 0.0 and self.gpu_ms > 0:
-            tdp_watts = _get_gpu_tdp()
+            tdp_watts = _get_tdp_for_device(self.device)
             self.energy_mj = tdp_watts * (self.gpu_ms / 1000.0)
 
 
-def _get_gpu_tdp() -> float:
-    """Return GPU TDP in watts, or a default of 150 W."""
-    if _HAS_NVML and torch.cuda.is_available():
-        try:
-            handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-            return pynvml.nvmlDeviceGetPowerManagementLimit(handle) / 1000.0
-        except Exception:
-            pass
-    return 150.0
+def _get_tdp_for_device(device: str) -> float:
+    """Return realistic power consumption for the device.
+    
+    Args:
+        device: "cuda" for GPU or "cpu" for CPU
+    
+    Returns:
+        Power in watts
+    """
+    if device == "cuda":
+        if _HAS_NVML and torch.cuda.is_available():
+            try:
+                handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+                return pynvml.nvmlDeviceGetPowerManagementLimit(handle) / 1000.0
+            except Exception:
+                pass
+        return 150.0  # Default GPU TDP
+    else:
+        # CPU power consumption: ~10-30W for typical inference on modern CPU
+        # Use conservative estimate of 15W for CPU inference
+        return 15.0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -69,7 +82,8 @@ class _MeasureRef:
 class GPUProfiler:
     """Thin wrapper for timing GPU/CPU inference."""
 
-    def __init__(self):
+    def __init__(self, device: str = "cpu"):
+        self.device = device
         self._vram_baseline = self._vram_used_mb()
 
     def _vram_used_mb(self) -> float:
@@ -111,6 +125,7 @@ class GPUProfiler:
             wall_ms       = wall_ms,
             vram_used_mb  = vram_after,
             vram_delta_mb = max(0.0, vram_after - vram_before),
+            device        = self.device,
         )
         ref.value = m
 

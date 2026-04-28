@@ -101,7 +101,7 @@ def _yolo_infer(model_tuple, frame):
         dets = {"boxes":  res.boxes.xyxy.cpu().numpy(),
                 "scores": res.boxes.conf.cpu().numpy(),
                 "n":      len(res.boxes)}
-    m = FrameMetrics("yolo", gpu_ms=ms, wall_ms=ms)
+    m = FrameMetrics("yolo", gpu_ms=ms, wall_ms=ms, device=DEVICE)
     m.n_detections   = dets["n"]
     m.avg_confidence = float(dets["scores"].mean()) if dets["n"] > 0 else 0.0
     return dets, m
@@ -133,7 +133,7 @@ def _rtdetr_infer(model_tuple, frame):
     if torch.cuda.is_available():
         torch.cuda.synchronize()
     ms = (time.perf_counter() - t0) * 1000
-    m  = FrameMetrics("rtdetr", gpu_ms=ms, wall_ms=ms)
+    m  = FrameMetrics("rtdetr", gpu_ms=ms, wall_ms=ms, device=DEVICE)
     m.n_detections   = dets["n"]
     m.avg_confidence = float(dets["scores"].mean()) if dets["n"] > 0 else 0.0
     return dets, m

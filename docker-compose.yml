@@ -1,7 +1,6 @@
 services:
   adaptalloc:
-    build: .
-    image: adaptalloc:latest
+    image: chatu05/adaptive_alloc:latest
     container_name: adaptalloc_demo
     ports:
       - "8501:8501"
@@ -16,10 +15,10 @@ services:
       - CONF_THRESH=${CONF_THRESH:-0.25}
       - ROBOFLOW_API_KEY=${ROBOFLOW_API_KEY:-}
     restart: unless-stopped
+    
 
   baseline:
-    build: .
-    image: adaptalloc:latest
+    image: chatu05/adaptive_alloc:latest
     container_name: adaptalloc_baseline
     command: >
       python baseline_compare.py
@@ -35,3 +34,6 @@ services:
       - ROBOFLOW_API_KEY=${ROBOFLOW_API_KEY:-}
     profiles:
       - baseline
+    
+
+  

@@ -95,7 +95,7 @@ class YOLOWrapper:
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
             ms = (time.perf_counter() - t0) * 1000.0
-            m = FrameMetrics("yolo", gpu_ms=ms, wall_ms=ms)
+            m = FrameMetrics("yolo", gpu_ms=ms, wall_ms=ms, device=self.device)
 
         res = results[0]
         if res.boxes is None or len(res.boxes) == 0:
@@ -177,7 +177,7 @@ class RTDETRWrapper:
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
             ms = (time.perf_counter() - t0) * 1000.0
-            m  = FrameMetrics("rtdetr", gpu_ms=ms, wall_ms=ms)
+            m  = FrameMetrics("rtdetr", gpu_ms=ms, wall_ms=ms, device=self.device)
         m.n_detections   = dets["n"]
         m.avg_confidence = float(dets["scores"].mean()) if dets["n"] > 0 else 0.0
         return dets, m
@@ -448,7 +448,7 @@ def _init_models():
     with st.spinner("Loading models (first run may download weights)…"):
         yolo   = YOLOWrapper(YOLO_WEIGHTS, CONF_THRESH)
         rtdetr = RTDETRWrapper(RTDETR_PATH, CONF_THRESH)
-        prof   = GPUProfiler()
+        prof   = GPUProfiler(device=DEVICE)
         sched  = RLScheduler(lam=ENERGY_ALPHA, epsilon=0.20)
         scorer = ModelAwareComplexityScorer()
         sched.load(CHECKPOINT_PATH)

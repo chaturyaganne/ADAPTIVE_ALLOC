@@ -80,7 +80,7 @@ class YOLOWrapper:
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
             ms = (time.perf_counter() - t0) * 1000
-            m = FrameMetrics("yolo", gpu_ms=ms, wall_ms=ms)
+            m = FrameMetrics("yolo", gpu_ms=ms, wall_ms=ms, device=DEVICE)
         res = results[0]
         if res.boxes is None or len(res.boxes) == 0:
             dets = {"boxes": np.empty((0, 4)), "scores": np.empty(0), "n": 0}
@@ -147,7 +147,7 @@ class RTDETRWrapper:
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
             ms = (time.perf_counter() - t0) * 1000
-            m  = FrameMetrics("rtdetr", gpu_ms=ms, wall_ms=ms)
+            m  = FrameMetrics("rtdetr", gpu_ms=ms, wall_ms=ms, device=DEVICE)
         m.n_detections   = dets["n"]
         m.avg_confidence = float(dets["scores"].mean()) if dets["n"] > 0 else 0.0
         return dets, m
@@ -273,7 +273,7 @@ class BaselineEvaluator:
         print(f"  RTDETR: {rtdetr_path or 'rtdetr-l.pt (auto)'}")
         print()
 
-        self.profiler = GPUProfiler()
+        self.profiler = GPUProfiler(device=DEVICE)
         print("[1/2] Loading YOLOv8 …")
         self.yolo = YOLOWrapper(yolo_weights, conf)
         print("[2/2] Loading RT-DETR …")
